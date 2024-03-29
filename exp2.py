@@ -60,7 +60,7 @@ def logistic_descent(X, y, theta, alpha, num_iters, batch_size, X_valid, y_valid
 
 theta = np.zeros((X_train.shape[1],1))
 alpha = 0.0001
-num_iters = 150
+num_iters = 300
 opt_theta, loss_train, Lvalidation = logistic_descent(X_train, y_train, theta, alpha, num_iters, 70, X_valid, y_valid)
 
 
@@ -78,3 +78,57 @@ plt.legend()
 plt.show()
 
 # SVM
+def hinge_loss(X, y, theta, t):
+    loss = np.maximum(0, 1 - np.multiply(y, X.dot(theta))).mean()
+    reg = np.multiply(theta,theta).sum() / 2
+    return t * loss + reg
+
+theta = np.random.random((X_train.shape[1],1))
+C = 0.5
+print("now loss: ",hinge_loss(X_train, y_train, theta, C))
+
+
+def hinge_gradient(X, y, theta, C):
+    error = np.maximum(0, 1 - np.multiply(y, X.dot(theta)))
+    index = np.where(error==0)
+    x = X.copy()
+    x[index,:] = 0
+    grad = theta - C * x.T.dot(y) / len(y)
+    grad[-1] = grad[-1] - theta[-1]
+    return grad
+
+def svm_descent(X, y, theta, alpha, num_iters, batch_size, X_valid, y_valid, C):
+    loss_train = np.zeros((num_iters,1))
+    loss_valid = np.zeros((num_iters,1))
+    data = np.concatenate((y, X), axis=1)
+    for i in range(num_iters):
+        sample = np.matrix(random.sample(data.tolist(), batch_size))
+        grad = hinge_gradient(sample[:,1:125], sample[:,0], theta, C)
+        theta = theta - alpha * grad
+        loss_train[i] = hinge_loss(X, y, theta, C)
+        loss_valid[i] = hinge_loss(X_valid, y_valid, theta, C)
+    return theta, loss_train, loss_valid
+
+def svm_score(X, y, theta):
+    hx = X.dot(theta)
+    hx[hx>=5] = 1
+    hx[hx<5] = -1
+    hx = (hx==y)
+    return np.mean(hx)
+
+theta = np.random.random((X_train.shape[1],1))
+alpha = 0.01
+num_iters = 500
+opt_theta, loss_train, Lvalidation = svm_descent(X_train, y_train, theta, alpha, num_iters, 70, X_valid, y_valid, C)
+
+
+print("svm_score",svm_score(X_valid, y_valid, opt_theta))
+
+iteration = np.arange(0, num_iters, step = 1)
+fig, ax = plt.subplots(figsize = (12,8))
+ax.set_title('Lvalidation change with iteration')
+ax.set_xlabel('iteration')
+ax.set_ylabel('loss')
+plt.plot(iteration, Lvalidation, 'r', label='Validation Set Loss')
+plt.legend()
+plt.show()
