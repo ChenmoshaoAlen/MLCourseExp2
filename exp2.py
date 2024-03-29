@@ -1,7 +1,5 @@
 import numpy as np
-import pandas as pd
 import sklearn.datasets as sd
-import sklearn.model_selection as sms
 import matplotlib.pyplot as plt
 import random
 
@@ -18,25 +16,20 @@ y_valid = y_valid.reshape(len(y_valid),1)
 X_train = np.concatenate((np.ones((X_train.shape[0],1)), X_train), axis = 1)#给x矩阵多增加1列1，拼接在每一行的末尾
 X_valid = np.concatenate((np.ones((X_valid.shape[0],1)), X_valid), axis = 1)
 
-#定义sigmoid函数，传入参数为向量时，对向量的每个参数进行运算后返回一个列表
 def sigmoid(z):
     return 1 / (1 + np.exp(-z))
 
-#定义 logistic loss 函数
 def logistic_loss(X, y ,theta):
     hx = sigmoid(X.dot(theta))
     cost = np.multiply(1+y, np.log(1+hx)) + np.multiply((1-y), np.log(1-hx))
     return -cost.mean()/2
 
-#计算当前 loss
 theta = np.zeros((X_train.shape[1],1))
 print("Now loss: ",logistic_loss(X_train, y_train, theta))
 
-#定义 logistic gradient 函数
 def logistic_gradient(X, y, theta):
     return X.T.dot(sigmoid(X.dot(theta)) - y)
 
-#定义 logistic score 函数，设置阈值为0.5
 def logistic_score(X, y, theta):
     hx = sigmoid(X.dot(theta))
     hx[hx>=0.5] = 1
@@ -44,7 +37,6 @@ def logistic_score(X, y, theta):
     hx = (hx==y)
     return np.mean(hx)
 
-#定义 logistic descent 函数
 def logistic_descent(X, y, theta, alpha, num_iters, batch_size, X_valid, y_valid):
     loss_train = np.zeros((num_iters,1))
     loss_valid = np.zeros((num_iters,1))
@@ -64,7 +56,6 @@ num_iters = 300
 opt_theta, loss_train, Lvalidation = logistic_descent(X_train, y_train, theta, alpha, num_iters, 70, X_valid, y_valid)
 
 
-#选择合适的阈值，将验证集中计算结果大于阈值的标记为正类，反之为负类,得到的平均值
 print("logistic_score: ",logistic_score(X_valid, y_valid, opt_theta))
 
 iteration = np.arange(0, num_iters, step = 1)
