@@ -5,6 +5,7 @@ import sklearn.model_selection as sms
 import matplotlib.pyplot as plt
 import random
 
+# logistic
 X_train, y_train = sd.load_svmlight_file('a9a.txt',n_features = 123)
 X_valid, y_valid = sd.load_svmlight_file('a9a.t.txt',n_features = 123)
 
@@ -75,3 +76,5 @@ plt.plot(iteration, Lvalidation, 'r', label='Validation Set Loss')
 plt.plot(iteration, loss_train, 'b', label='train Loss')
 plt.legend()
 plt.show()
+
+# SVM
